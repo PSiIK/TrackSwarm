@@ -4,11 +4,11 @@ import pygame.joystick as joystick
 import pygame
 
 # Gamepad constants
-GAMEPAD_ID = 0
+GAMEPAD_ID = 1
 LEFT_STICK_X_ID = 0
 LEFT_STICK_Y_ID = 1
-RIGHT_TRIGGER_ID = 4
-LEFT_TRIGGER_ID = 5
+RIGHT_TRIGGER_ID = 5
+LEFT_TRIGGER_ID = 2
 
 # Initialize pygame modules
 pygame.init()
@@ -17,7 +17,7 @@ pygame.init()
 def main():
   # Initialize jetracer
   car = NvidiaRacecar()
-  car.steering_offset = -0.00390625
+  car.steering_offset = -0.004180908203125
   print("JetRacer has been initialized!")  
   
   # Print out controller informations

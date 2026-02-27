@@ -6,8 +6,8 @@ import pygame
 GAMEPAD_ID = 0
 LEFT_STICK_X_ID = 0
 LEFT_STICK_Y_ID = 1
-RIGHT_TRIGGER_ID = 4
-LEFT_TRIGGER_ID = 5
+RIGHT_TRIGGER_ID = 5
+LEFT_TRIGGER_ID = 2
 
 # Initialize pygame modules
 pygame.init()

@@ -1,17 +1,23 @@
-from nvidialibs.jetcam.csi_camera import CSICamera
 import cv2
 
-camera = CSICamera()
-img = camera.read()
 
+gst=("nvarguscamerasrc ! sensor-id=0 ! "
+        "nvvidconv ! "
+        "videoconvert ! "
+		"appsink")
+cap = cv2.VideoCapture(gst, cv2.CAP_GSTREAMER)
+if not cap.isOpened():
+	raise RuntimeError ("Error GStreamer")
 while True:
-	frame=camera.read()
-	cv2.imshow("Cam", frame)
-	if cv2.waitKey(1) & 0xFF in (27, ord('q')):
+	ret,frame= cap.read()
+	if not ret:
 		break
-
-camera.running=False
+	cv2.imshow("camera",frame)
+	if cv2.waitKey(1) & 0xFF==27:
+			break
+cap.release()
 cv2.destroyAllWindows()
 
+#nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM), width=640, height=480, format=NV12, framerate=30/1 ! nvvidconv ! video/x-raw, width=640, height=480, format=BGRx ! videoconvert ! autovideosink
 
-
+ #gst-launch-1.0 nvarguscamerasrc sensor-id=0 ! "video/x-raw(memory:NVMM),width=640,height=480" ! nvvidconv  ! videoconvert ! autovideosink
