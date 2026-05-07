@@ -2,7 +2,6 @@ import math
 import numpy as np
 import time
 import os
-from scipy.linalg import svd
 from gz.transport import Node
 from gz.msgs.laserscan_pb2 import LaserScan
 start=0
@@ -57,7 +56,7 @@ class GazeboSLAM:
         modnewpoints = newpoints-newcentre
         modoldpoints = oldpoints - oldcentre
         H=np.dot(modnewpoints.T, modoldpoints) 
-        (U,L,V_T)=svd(H)
+        (U,L,V_T)=np.linalg.svd(H)
         R = np.dot(V_T.T,U.T)
         tx =oldcentre[0] - (newcentre[0]*R[0][0] + newcentre[1]*R[0][1])
         ty= oldcentre[1] - (newcentre[0]*R[1][0] + newcentre[1]*R[1][1])
@@ -209,11 +208,11 @@ class GazeboSLAM:
         scan_map = []
         empty_rays=[]
         for i, rang in enumerate(msg.ranges):
-            if math.isinf(rang) or math.isnan(rang) or rang<0.2:
+            if   rang<0.2:
                 continue
             angle_measured = msg.angle_min + i * msg.angle_step
             angle_calculated = rob_angle + angle_measured
-            if  rang > 9.5:
+            if  math.isinf(rang) or math.isnan(rang) or rang > 9.5:
                 X = rob_x + 9.5 * math.cos(angle_calculated)
                 Y = rob_y + 9.5 * math.sin(angle_calculated)
                 empty_rays.append([X, Y])
