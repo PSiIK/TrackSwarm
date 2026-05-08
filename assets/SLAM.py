@@ -1,10 +1,5 @@
 import math
 import numpy as np
-import time
-import os
-from gz.transport import Node
-from gz.msgs.laserscan_pb2 import LaserScan
-start=0
 class submap:
     def __init__(self, global_x_start, global_y_start, global_angle_start):
         self.grid = np.zeros((300,300), dtype=float)
@@ -26,9 +21,6 @@ class GazeboSLAM:
         self.global_angle = 0.0
         self.distance=0
         self.history =[]
-        self.node = Node()
-        command="/scan"
-        self.node.subscribe(LaserScan,command,self.scan_response)
     def find_closest_points(self,new_points, old_points): # szukanie punktów do ustalenia przemieszczenia robota
         pairs = []
         for new_point in new_points:
@@ -207,24 +199,18 @@ class GazeboSLAM:
         rob_x, rob_y, rob_angle = robpos
         scan_map = []
         empty_rays=[]
-        for i, rang in enumerate(msg.ranges):
+        for _, ang, rang in msg:
+            scaled_rang = rang/1000
             if   rang<0.2:
                 continue
-            angle_measured = msg.angle_min + i * msg.angle_step
+            angle_measured = math.radians(ang)
             angle_calculated = rob_angle + angle_measured
-            if  math.isinf(rang) or math.isnan(rang) or rang > 9.5:
+            if  math.isinf(scaled_rang) or math.isnan(scaled_rang) or scaled_rang > 9.5:
                 X = rob_x + 9.5 * math.cos(angle_calculated)
                 Y = rob_y + 9.5 * math.sin(angle_calculated)
                 empty_rays.append([X, Y])
             else:
-                X = rob_x + rang * math.cos(angle_calculated)
-                Y = rob_y + rang * math.sin(angle_calculated)
+                X = rob_x + scaled_rang * math.cos(angle_calculated)
+                Y = rob_y + scaled_rang * math.sin(angle_calculated)
                 scan_map.append([X, Y])
         return empty_rays, scan_map
-if (__name__ == "__main__"):
-    SLAM = GazeboSLAM()
-    try:
-        while True:
-            time.sleep(1.0)
-    except KeyboardInterrupt:
-        os._exit(0)
