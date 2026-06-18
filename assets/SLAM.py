@@ -147,7 +147,7 @@ class GazeboSLAM:
             self.submaps[i].global_pos = (new_x,new_y,new_angle)
     def scan_response(self, msg): # serce programu
         robpos=[0,0,0]
-        empty_rays,newscan=self.converting_gazebo(robpos,msg)
+        empty_rays,newscan=self.converting_lidar(robpos,msg)
         if (len(self.oldmap)==0):
             self.oldmap = newscan
             return
@@ -172,6 +172,8 @@ class GazeboSLAM:
                 np.save(filename,self.active_submap.grid)
                 self.submaps.append(self.active_submap)
                 self.active_submap = submap(self.global_x,self.global_y,self.global_angle)
+                with open("pos.txt", 'w') as file:
+                    print(self.global_x, " ", self.global_y, file=file)
                 print("zapis danych")
             if (self.distance%1.0<step):
                 possib_loop= self.search_for_loop(self.global_x,self.global_y, self.distance,self.history)
@@ -195,7 +197,7 @@ class GazeboSLAM:
             if(rob_distance<=search_area):
                 prob_loops.append(hist)
         return prob_loops
-    def converting_gazebo(self, robpos, msg): # Do zmiany w przypadku wprowadzenia do robota
+    def converting_lidar(self, robpos, msg):
         rob_x, rob_y, rob_angle = robpos
         scan_map = []
         empty_rays=[]
